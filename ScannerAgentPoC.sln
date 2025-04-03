@@ -5,6 +5,10 @@ VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerAgent", "ScannerAgent\ScannerAgent.csproj", "{93D577E6-1B27-455D-A2A9-1DC2836DAB3F}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "reactapp.client", "ReactApp\reactapp.client\reactapp.client.esproj", "{CEC5919B-FE68-EDE6-628D-888E9BAE4086}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactApp.Server", "ReactApp\ReactApp.Server\ReactApp.Server.csproj", "{027C9E5F-D077-42D0-A0E8-F854320B2599}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,16 @@ Global
 		{93D577E6-1B27-455D-A2A9-1DC2836DAB3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93D577E6-1B27-455D-A2A9-1DC2836DAB3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93D577E6-1B27-455D-A2A9-1DC2836DAB3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEC5919B-FE68-EDE6-628D-888E9BAE4086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEC5919B-FE68-EDE6-628D-888E9BAE4086}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEC5919B-FE68-EDE6-628D-888E9BAE4086}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CEC5919B-FE68-EDE6-628D-888E9BAE4086}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEC5919B-FE68-EDE6-628D-888E9BAE4086}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEC5919B-FE68-EDE6-628D-888E9BAE4086}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{027C9E5F-D077-42D0-A0E8-F854320B2599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027C9E5F-D077-42D0-A0E8-F854320B2599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027C9E5F-D077-42D0-A0E8-F854320B2599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027C9E5F-D077-42D0-A0E8-F854320B2599}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

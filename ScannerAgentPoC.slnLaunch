@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "Full debug",
+    "Projects": [
+      {
+        "Path": "ScannerAgent\\ScannerAgent.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ReactApp\\reactapp.client\\reactapp.client.esproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ReactApp\\ReactApp.Server\\ReactApp.Server.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
