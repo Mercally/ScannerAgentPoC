@@ -25,6 +25,16 @@ internal class SignalRServer
         Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowReactApp", builder =>
+                        builder
+                            .WithOrigins("https://localhost:53348")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials());
+                });
+
                 services.AddSignalR();
             })
             .ConfigureWebHostDefaults(webBuilder =>
@@ -33,6 +43,7 @@ internal class SignalRServer
                 webBuilder.Configure(app =>
                 {
                     app.UseRouting();
+                    app.UseCors("AllowReactApp");
                     app.UseEndpoints(endpoints =>
                     {
                         endpoints.MapHub<ScannerHub>("/scannerHub");

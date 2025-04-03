@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace ScannerAgent
+namespace ScannerAgent;
+
+public class ScannerHub : Hub
 {
-    public class ScannerHub : Hub
+    private readonly ScannerManager scannerManager = new();
+
+    public string[] GetScanners()
     {
-        private ScannerManager scannerManager = new ScannerManager();
+        return scannerManager.GetScanners().ToArray();
+    }
 
-        public string[] GetScanners()
-        {
-            return scannerManager.GetScanners().ToArray();
-        }
-
-        public string ScanDocument(string scannerName)
-        {
-            string filePath = scannerManager.Scan(scannerName);
-            Clients.All.SendAsync("DocumentScanned", filePath);
-            return filePath;
-        }
+    public string ScanDocument(string scannerName)
+    {
+        string filePath = scannerManager.Scan(scannerName);
+        Clients.All.SendAsync("DocumentScanned", filePath);
+        return filePath;
     }
 }
