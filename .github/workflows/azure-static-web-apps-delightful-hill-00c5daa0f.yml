@@ -27,9 +27,11 @@ jobs:
           
       - name: Install dependencies
         run: npm install
+        working-directory: "./ReactApp/reactapp.client"
         
       - name: Build the app
         run: npm run build
+        working-directory: "./ReactApp/reactapp.client"
         
       - name: Build And Deploy
         id: builddeploy
