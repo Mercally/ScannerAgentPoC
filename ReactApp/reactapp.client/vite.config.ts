@@ -7,7 +7,7 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-const isCI = true; // process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+//const isCI = true; // process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
