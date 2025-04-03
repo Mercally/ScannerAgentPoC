@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import './ScannerList.css';
 
 function ScannerList() {
 
     const [scanners, setScanners] = useState([]);
-    const [connection, setConnection] = useState(null);
+    const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
 
     useEffect(() => {
