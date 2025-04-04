@@ -95,7 +95,6 @@
             // 
             listBoxFiles.Dock = DockStyle.Fill;
             listBoxFiles.FormattingEnabled = true;
-            listBoxFiles.ItemHeight = 15;
             listBoxFiles.Location = new Point(43, 115);
             listBoxFiles.Name = "listBoxFiles";
             listBoxFiles.Size = new Size(714, 309);
@@ -146,7 +145,7 @@
             button1.Name = "button1";
             button1.Size = new Size(75, 22);
             button1.TabIndex = 2;
-            button1.Text = "Scanear ";
+            button1.Text = "Scan";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 

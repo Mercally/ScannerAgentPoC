@@ -7,7 +7,6 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-const isCI = true; // process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
@@ -56,7 +55,7 @@ export default defineConfig({
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '53348'),
-        https: isCI ? undefined : {
+        https: {
             key: fs.readFileSync(keyFilePath),
             cert: fs.readFileSync(certFilePath),
         }

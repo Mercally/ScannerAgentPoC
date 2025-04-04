@@ -32,6 +32,10 @@ internal class SignalRServer
                             .WithOrigins("https://localhost:53348")
                             .AllowAnyHeader()
                             .AllowAnyMethod()
+                            .AllowCredentials()
+                            .WithOrigins("https://delightful-hill-00c5daa0f.6.azurestaticapps.net")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
                             .AllowCredentials());
                 });
 
