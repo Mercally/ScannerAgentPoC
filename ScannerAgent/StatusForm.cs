@@ -1,3 +1,6 @@
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
+
 namespace ScannerAgent;
 
 public partial class StatusForm : Form
@@ -58,7 +61,7 @@ public partial class StatusForm : Form
         comboBoxScanners.SelectedIndex = 0;
     }
 
-    private void button1_Click(object sender, EventArgs e)
+    private void btnScan_Click(object sender, EventArgs e)
     {
         string selectedScanner = comboBoxScanners.SelectedItem?.ToString() ?? "No hay escáneres disponibles";
 
@@ -75,5 +78,67 @@ public partial class StatusForm : Form
         {
             MessageBox.Show("No hay escáner disponible para escanear.");
         }
+    }
+
+    private void btnScanDocument_Click(object sender, EventArgs e)
+    {
+        List<Image> scannedImages = new List<Image>();
+        string selectedScanner = comboBoxScanners.SelectedItem?.ToString() ?? "No hay escáneres disponibles";
+
+        while (true)
+        {
+            try
+            {
+                string tempPath = scannerManager.Scan(selectedScanner);
+                scannedImages.Add(Image.FromFile(tempPath));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Fin del escaneo o error: " + ex.Message);
+                break;
+            }
+
+            var continueScan = MessageBox.Show("¿Deseas escanear otra página?", "Escaneo", MessageBoxButtons.YesNo);
+            if (continueScan == DialogResult.No)
+                break;
+        }
+
+        if (scannedImages.Count == 0)
+        {
+            MessageBox.Show("No se escanearon imágenes.");
+            return;
+        }
+
+        string userDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        string outputPath = Path.Combine(userDocumentsPath, "TempData");
+
+
+        SaveImagesAsPdf(scannedImages, outputPath);
+    }
+
+    void SaveImagesAsPdf(List<Image> images, string outputPath)
+    {
+        var document = new PdfDocument();
+
+        if (!Directory.Exists(outputPath))
+        {
+            Directory.CreateDirectory(outputPath);
+        }
+
+        foreach (var img in images)
+        {
+            using var stream = new MemoryStream();
+            img.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            var page = document.AddPage();
+            page.Width = img.Width * 72 / img.HorizontalResolution;
+            page.Height = img.Height * 72 / img.VerticalResolution;
+
+            using XGraphics gfx = XGraphics.FromPdfPage(page);
+            using XImage xImage = XImage.FromStream(stream);
+            gfx.DrawImage(xImage, 0, 0);
+        }
+
+        document.Save(Path.Combine(outputPath, $"{Guid.NewGuid()}.pdf"));
     }
 }

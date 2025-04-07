@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
-import './ScannerList.css';
+import './SingleScan.css';
 
-function ScannerList() {
+function SingleScan() {
 
     const [scanners, setScanners] = useState([]);
-    const [selectedScanner, setSelectedScanner] = useState<string>('');
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
 
@@ -26,13 +25,11 @@ function ScannerList() {
         connection.start().then(() => {
             console.log("Conectado a SignalR");
 
-            connection.invoke("GetScanners")
-                .then((data) => setScanners(data))
-                .catch((err) => console.error("Error obteniendo scanners:", err));
-
             connection.on("DocumentScanned", (data: ScanSingleImage) => {
                 console.log(data);
             });
+
+
 
         }).catch((err) => console.error("Error al conectar a SignalR:", err));
 
@@ -43,28 +40,18 @@ function ScannerList() {
         if (!connection)
             return;
 
-        connection.invoke("ScanSingleImage", selectedScanner)
-        .then((data:ScanSingleImage) => console.log(data))
-        .catch((err) => console.error("Error lanzando scanner:", err));
+        connection.invoke("ScanSingleImage");
+            //.then((data:ScanSingleImage) => console.log(data))
+            //.catch((err) => console.error("Error obteniendo scanners:", err));
 
     }
 
     return (
         <div>
-            <h1>Escaneres Disponibles</h1>
-            <select onChange={(e) => setSelectedScanner(e.target.value)}>
-                {
-                    scanners.map((scanner, index) => (
-                        <option key={index} value={scanner}>{scanner}</option>
-                    ))
-                }
-            </select>
-            <div>
-                <h3>Escanear una imagen</h3>
-                <button onClick={() => triggerSingleScan()}>Escanear</button>
-            </div>
+            <h1>Escanear una imagen</h1>
+            <button onClick={() => triggerSingleScan()}>Escanear</button>
         </div>
-  );
+    );
 }
 
 interface ScanSingleImage {
@@ -72,4 +59,4 @@ interface ScanSingleImage {
     base64Data: string;
 }
 
-export default ScannerList;
+export default SingleScan;

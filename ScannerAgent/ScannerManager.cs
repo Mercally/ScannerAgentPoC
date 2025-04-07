@@ -1,4 +1,5 @@
-﻿using WIA;
+﻿using System.Runtime.InteropServices;
+using WIA;
 
 namespace ScannerAgent;
 
@@ -22,10 +23,11 @@ internal class ScannerManager
 
     public string Scan(string scannerName)
     {
+        Device scannerDevice = null;
+
         try
         {
             DeviceManager deviceManager = new();
-            Device scannerDevice = null;
 
             foreach (DeviceInfo device in deviceManager.DeviceInfos)
             {
@@ -46,7 +48,9 @@ internal class ScannerManager
 
             ImageFile image = (ImageFile)scannerItem.Transfer(); // Escanear en JPEG
 
-            string outputPath = Path.Combine(Application.StartupPath, "ScannedDocument.jpg");
+            string userDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+
+            string outputPath = Path.Combine(userDocumentsPath, $"{Guid.NewGuid()}.jpg");
 
             byte[] imageBytes = (byte[])image.FileData.get_BinaryData();
             File.WriteAllBytes(outputPath, imageBytes);
@@ -57,6 +61,15 @@ internal class ScannerManager
         {
             MessageBox.Show("Error al escanear: " + ex.Message);
             return null;
+        }
+        finally
+        {
+            // Ensure the device is released
+            if (scannerDevice != null)
+            {
+                Marshal.ReleaseComObject(scannerDevice);
+                scannerDevice = null;
+            }
         }
     }
 }

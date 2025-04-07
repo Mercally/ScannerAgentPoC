@@ -39,10 +39,13 @@
             tableLayoutPanel2 = new TableLayoutPanel();
             label1 = new Label();
             comboBoxScanners = new ComboBox();
+            tableLayoutPanel3 = new TableLayoutPanel();
+            btnScanDocument = new Button();
             button1 = new Button();
             contextMenuStrip.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
+            tableLayoutPanel3.SuspendLayout();
             SuspendLayout();
             // 
             // notifyIcon
@@ -108,7 +111,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanel2.Controls.Add(label1, 0, 1);
             tableLayoutPanel2.Controls.Add(comboBoxScanners, 1, 1);
-            tableLayoutPanel2.Controls.Add(button1, 2, 1);
+            tableLayoutPanel2.Controls.Add(tableLayoutPanel3, 2, 1);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(43, 25);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -139,15 +142,40 @@
             comboBoxScanners.Size = new Size(351, 23);
             comboBoxScanners.TabIndex = 1;
             // 
+            // tableLayoutPanel3
+            // 
+            tableLayoutPanel3.ColumnCount = 2;
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel3.Controls.Add(btnScanDocument, 1, 0);
+            tableLayoutPanel3.Controls.Add(button1, 0, 0);
+            tableLayoutPanel3.Location = new Point(535, 28);
+            tableLayoutPanel3.Margin = new Padding(0);
+            tableLayoutPanel3.Name = "tableLayoutPanel3";
+            tableLayoutPanel3.RowCount = 1;
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel3.Size = new Size(179, 28);
+            tableLayoutPanel3.TabIndex = 3;
+            // 
+            // btnScanDocument
+            // 
+            btnScanDocument.Location = new Point(92, 3);
+            btnScanDocument.Name = "btnScanDocument";
+            btnScanDocument.Size = new Size(75, 22);
+            btnScanDocument.TabIndex = 3;
+            btnScanDocument.Text = "Scan Doc";
+            btnScanDocument.UseVisualStyleBackColor = true;
+            btnScanDocument.Click += btnScanDocument_Click;
+            // 
             // button1
             // 
-            button1.Location = new Point(538, 31);
+            button1.Location = new Point(3, 3);
             button1.Name = "button1";
             button1.Size = new Size(75, 22);
             button1.TabIndex = 2;
             button1.Text = "Scan";
             button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            button1.Click += btnScan_Click;
             // 
             // StatusForm
             // 
@@ -164,6 +192,7 @@
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
             tableLayoutPanel2.PerformLayout();
+            tableLayoutPanel3.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -179,5 +208,7 @@
         private Label label1;
         private ComboBox comboBoxScanners;
         private Button button1;
+        private TableLayoutPanel tableLayoutPanel3;
+        private Button btnScanDocument;
     }
 }
