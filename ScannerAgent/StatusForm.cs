@@ -5,11 +5,13 @@ namespace ScannerAgent;
 
 public partial class StatusForm : Form
 {
-    private ScannerManager scannerManager = new();
+    private readonly ScannerManager _scannerManager;
 
-    public StatusForm()
+    public StatusForm(ScannerManager scannerManager)
     {
         InitializeComponent();
+
+        _scannerManager = scannerManager;
         CargarScanners();
     }
 
@@ -37,8 +39,6 @@ public partial class StatusForm : Form
         }
     }
 
-    // =====
-
     public void AddFileRow(string fileName)
     {
         listBoxFiles.Items.Add(fileName);
@@ -46,7 +46,7 @@ public partial class StatusForm : Form
 
     private void CargarScanners()
     {
-        List<string> scanners = scannerManager.GetScanners();
+        List<string> scanners = _scannerManager.GetScanners();
         comboBoxScanners.Items.Clear();
 
         if (scanners.Count == 0)
@@ -61,13 +61,13 @@ public partial class StatusForm : Form
         comboBoxScanners.SelectedIndex = 0;
     }
 
-    private void btnScan_Click(object sender, EventArgs e)
+    private async void btnScan_Click(object sender, EventArgs e)
     {
         string selectedScanner = comboBoxScanners.SelectedItem?.ToString() ?? "No hay escáneres disponibles";
 
         if (selectedScanner != "No hay escáneres disponibles")
         {
-            string filePath = scannerManager.Scan(selectedScanner);
+            string filePath = await _scannerManager.ScanAsync(selectedScanner, Guid.NewGuid()).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(filePath))
             {
@@ -80,7 +80,7 @@ public partial class StatusForm : Form
         }
     }
 
-    private void btnScanDocument_Click(object sender, EventArgs e)
+    private async void btnScanDocument_Click(object sender, EventArgs e)
     {
         List<Image> scannedImages = new List<Image>();
         string selectedScanner = comboBoxScanners.SelectedItem?.ToString() ?? "No hay escáneres disponibles";
@@ -89,7 +89,8 @@ public partial class StatusForm : Form
         {
             try
             {
-                string tempPath = scannerManager.Scan(selectedScanner);
+                string tempPath = await _scannerManager.ScanAsync(selectedScanner, Guid.NewGuid()).ConfigureAwait(false);
+
                 scannedImages.Add(Image.FromFile(tempPath));
             }
             catch (Exception ex)

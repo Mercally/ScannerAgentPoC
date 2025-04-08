@@ -1,10 +1,18 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.AspNetCore.SignalR;
+using System.Runtime.InteropServices;
 using WIA;
 
 namespace ScannerAgent;
 
-internal class ScannerManager
+public class ScannerManager
 {
+    private readonly IHubContext<ScannerHub> _hubContext;
+
+    public ScannerManager(IHubContext<ScannerHub> hubContext)
+    {
+        _hubContext = hubContext;
+    }
+
     public List<string> GetScanners()
     {
         List<string> scannerList = new List<string>();
@@ -21,9 +29,10 @@ internal class ScannerManager
         return scannerList;
     }
 
-    public string Scan(string scannerName)
+    public async ValueTask<string> ScanAsync(string scannerName, Guid tempFileId)
     {
-        Device scannerDevice = null;
+        Device? scannerDevice = null;
+        string outputPath = string.Empty;
 
         try
         {
@@ -41,26 +50,34 @@ internal class ScannerManager
             if (scannerDevice == null)
             {
                 MessageBox.Show("Escáner no encontrado.");
-                return null;
+                return outputPath;
             }
 
-            Item scannerItem = scannerDevice.Items[1]; // Primer elemento del escáner
+            Item scannerItem = scannerDevice.Items[1];
 
-            ImageFile image = (ImageFile)scannerItem.Transfer(); // Escanear en JPEG
+            ImageFile image = (ImageFile)scannerItem.Transfer();
 
             string userDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
-            string outputPath = Path.Combine(userDocumentsPath, $"{Guid.NewGuid()}.jpg");
+            outputPath = Path.Combine(userDocumentsPath, $"{tempFileId}.jpg");
 
             byte[] imageBytes = (byte[])image.FileData.get_BinaryData();
-            File.WriteAllBytes(outputPath, imageBytes);
+            await File.WriteAllBytesAsync(outputPath, imageBytes).ConfigureAwait(false);
 
-            return outputPath;
+            ScanSingleImage dataToBeSent = new()
+            {
+                Base64Data = Convert.ToBase64String(imageBytes),
+                FileName = outputPath,
+                TempFileId = tempFileId
+            };
+
+            await _hubContext.Clients.All.SendAsync("DocumentScanned", dataToBeSent).ConfigureAwait(false);
+
+
         }
         catch (Exception ex)
         {
             MessageBox.Show("Error al escanear: " + ex.Message);
-            return null;
         }
         finally
         {
@@ -68,8 +85,9 @@ internal class ScannerManager
             if (scannerDevice != null)
             {
                 Marshal.ReleaseComObject(scannerDevice);
-                scannerDevice = null;
             }
         }
+
+        return outputPath;
     }
 }
