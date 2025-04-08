@@ -31,13 +31,23 @@ public class ScannerHub : Hub
 
         return tempFileId.ToString();
     }
-}
 
-public class ScanSingleImage
-{
-    public Guid TempFileId { get; set; }
+    public string ScanDocument(string scannerName, Guid tempFileId)
+    {
+        Guid tempPageId = Guid.NewGuid();
+        using var scope = _serviceProvider.CreateScope();
+        var scannerManager = scope.ServiceProvider.GetRequiredService<ScannerManager>();
 
-    public string Base64Data { get; set; } = string.Empty;
+        _ = Task.Run(() => scannerManager.PerpetualScanAsync(scannerName, tempFileId, tempPageId));
 
-    public string FileName { get; set; } = string.Empty;
+        return tempPageId.ToString();
+    }
+
+    public string StopScanDocument(string scannerName, Guid tempFileId)
+    {
+
+
+
+        return tempFileId.ToString();
+    }
 }

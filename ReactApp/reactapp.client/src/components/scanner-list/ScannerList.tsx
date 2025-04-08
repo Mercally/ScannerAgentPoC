@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import './ScannerList.css';
+import { connect } from 'node:tls';
 
 function ScannerList() {
 
-    const [scanners, setScanners] = useState([]);
+    const [scanners, setScanners] = useState<string[]>([]);
     const [selectedScanner, setSelectedScanner] = useState<string>('');
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [scannedImage, setScannedImage] = useState<ScanSingleImage | null>(null);
+
+    const [documentId, setDocumentId] = useState<string | null>(null);
 
     useEffect(() => {
         const newConnection = new signalR.HubConnectionBuilder()
@@ -23,15 +28,27 @@ function ScannerList() {
         if (!connection)
             return;
 
+        setIsLoading(true);
+
         connection.start().then(() => {
             console.log("Conectado a SignalR");
 
             connection.invoke("GetScanners")
-                .then((data) => setScanners(data))
+                .then((scanners: string[]) => {
+                    setScanners(scanners);
+                    setSelectedScanner(scanners[0]);
+                    setIsLoading(false);
+                })
                 .catch((err) => console.error("Error obteniendo scanners:", err));
 
             connection.on("DocumentScanned", (data: ScanSingleImage) => {
                 console.log(data);
+                setScannedImage(data);
+            });
+
+            connection.on("NewPageScanned", (data: ScanDocumentResult) => {
+                console.log(data);
+                setScannedImage(data);
             });
 
         }).catch((err) => console.error("Error al conectar a SignalR:", err));
@@ -44,9 +61,49 @@ function ScannerList() {
             return;
 
         connection.invoke("ScanSingleImage", selectedScanner)
-        .then((data:ScanSingleImage) => console.log(data))
-        .catch((err) => console.error("Error lanzando scanner:", err));
+            .then((data:string) => console.log(data))
+            .catch((err) => console.error("Error lanzando scanner:", err));
 
+    }
+
+    const triggerDocumentScan = () => {
+
+        if (!connection)
+            return;
+
+        const guid = generateGuid();
+
+        setDocumentId(guid);
+
+        connection.invoke("ScanDocument", selectedScanner, guid)
+            .then((data:string) => console.log(data))
+            .catch((err) => console.error("Error lanzando scanner:", err));
+    }
+
+    const triggerDocumentScanNewPage = () => {
+
+        if (!connection)
+            return;
+
+        if (!documentId)
+            return;
+
+        connection.invoke("ScanDocument", selectedScanner, documentId)
+            .then((data: string) => console.log(data))
+            .catch((err) => console.error("Error lanzando scanner:", err));
+    }
+
+    const triggerDocumentStop = () => {
+
+        if (!connection)
+            return;
+
+        if (!documentId)
+            return;
+
+        connection.invoke("StopScan", selectedScanner, documentId)
+            .then((data: string) => console.log(data))
+            .catch((err) => console.error("Error lanzando scanner:", err));
     }
 
     return (
@@ -59,9 +116,27 @@ function ScannerList() {
                     ))
                 }
             </select>
+            <br />
             <div>
                 <h3>Escanear una imagen</h3>
-                <button onClick={() => triggerSingleScan()}>Escanear</button>
+                <button
+                    disabled={isLoading}
+                    onClick={() => triggerSingleScan()}>Escanear Imagen</button>
+            </div>
+            <br />
+            <div>
+                <h3>Escanear un documento</h3>
+                <button
+                    disabled={isLoading && !documentId}
+                    onClick={() => triggerDocumentScan()}>Escanear Documento</button>
+
+                <button
+                    disabled={isLoading && !documentId}
+                    onClick={() => triggerDocumentScanNewPage()}>Escanear otra pagina</button>
+
+                <button
+                    disabled={isLoading && !documentId}
+                    onClick={() => triggerDocumentStop()}>Terminar documento</button>
             </div>
         </div>
   );
@@ -71,5 +146,21 @@ interface ScanSingleImage {
     tempFileId: string;
     base64Data: string;
 }
+
+interface ScanDocumentResult {
+    tempFileId: string;
+    tempPageId: string;
+    base64Data: string;
+}
+
+const generateGuid = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+
 
 export default ScannerList;
