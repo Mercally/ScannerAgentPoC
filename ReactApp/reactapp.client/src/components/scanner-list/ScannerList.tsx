@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
+import ReactFilePreviewer from 'react-file-previewer';
+
 import './ScannerList.css';
-import { connect } from 'node:tls';
+
 
 function ScannerList() {
 
@@ -137,6 +139,16 @@ function ScannerList() {
                 <button
                     disabled={isLoading && !documentId}
                     onClick={() => triggerDocumentStop()}>Terminar documento</button>
+            </div>
+            <div>
+                <h3>Previewer</h3>
+                <div>
+                    <ReactFilePreviewer file={{
+                        data: scannedImage?.base64Data,
+                        mimeType: "image/jpg",
+                        name: 'image.jpg'
+                    }} />
+                </div>
             </div>
         </div>
   );
