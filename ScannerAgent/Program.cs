@@ -8,6 +8,7 @@ namespace ScannerAgent;
 internal static class Program
 {
     private static IHost _host;
+    public const string UPLOAD_API = "UploadAPI";
 
     /// <summary>
     ///  The main entry point for the application.
@@ -52,6 +53,11 @@ internal static class Program
 
                 // DI
                 services.AddSingleton<ScannerManager>();
+
+                services.AddHttpClient(UPLOAD_API, client =>
+                {
+                    client.BaseAddress = new Uri("https://localhost:7014");
+                });
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {

@@ -43,11 +43,12 @@ public class ScannerHub : Hub
         return tempPageId.ToString();
     }
 
-    public string StopScanDocument(string scannerName, Guid tempFileId)
+    public string StopDocumentScan(Guid tempFolderId)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var scannerManager = scope.ServiceProvider.GetRequiredService<ScannerManager>();
+        _ = Task.Run(() => scannerManager.UploadFile(tempFolderId));
 
-
-
-        return tempFileId.ToString();
+        return tempFolderId.ToString();
     }
 }

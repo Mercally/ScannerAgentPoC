@@ -12,7 +12,7 @@ function ScannerList() {
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [scannedImage, setScannedImage] = useState<ScanSingleImage | null>(null);
+    const [scannedImage, setScannedImage] = useState<ScanDocumentResult | null>(null);
 
     const [documentId, setDocumentId] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ function ScannerList() {
                 })
                 .catch((err) => console.error("Error obteniendo scanners:", err));
 
-            connection.on("DocumentScanned", (data: ScanSingleImage) => {
+            connection.on("DocumentScanned", (data: ScanDocumentResult) => {
                 console.log(data);
                 setScannedImage(data);
             });
@@ -52,6 +52,14 @@ function ScannerList() {
                 console.log(data);
                 setScannedImage(data);
             });
+
+            connection.on("DocumentUploaded", () => {
+                console.log("Document uploaded successfully");
+
+                setScannedImage(null);
+                setDocumentId(null);
+                setIsLoading(false);
+            })
 
         }).catch((err) => console.error("Error al conectar a SignalR:", err));
 
@@ -73,12 +81,14 @@ function ScannerList() {
         if (!connection)
             return;
 
+        setDocumentId(null);
         const guid = generateGuid();
 
-        setDocumentId(guid);
-
         connection.invoke("ScanDocument", selectedScanner, guid)
-            .then((data:string) => console.log(data))
+            .then((data: string) => {
+                console.log(data);
+                setDocumentId(guid);
+            })
             .catch((err) => console.error("Error lanzando scanner:", err));
     }
 
@@ -103,9 +113,15 @@ function ScannerList() {
         if (!documentId)
             return;
 
-        connection.invoke("StopScan", selectedScanner, documentId)
-            .then((data: string) => console.log(data))
-            .catch((err) => console.error("Error lanzando scanner:", err));
+        connection.invoke("StopDocumentScan", documentId)
+            .then((data: string) => {
+                console.log(data);
+                setIsLoading(true);
+            })
+            .catch((err) => {
+                console.error("Error lanzando scanner:", err);
+                setIsLoading(false);
+            });
     }
 
     return (
@@ -123,46 +139,46 @@ function ScannerList() {
                 <h3>Escanear una imagen</h3>
                 <button
                     disabled={isLoading}
-                    onClick={() => triggerSingleScan()}>Escanear Imagen</button>
+                    onClick={() => triggerSingleScan()}>Escanear imagen</button>
             </div>
             <br />
             <div>
                 <h3>Escanear un documento</h3>
                 <button
                     disabled={isLoading && !documentId}
-                    onClick={() => triggerDocumentScan()}>Escanear Documento</button>
+                    onClick={() => triggerDocumentScan()}>Escanear nuevo documento</button>
 
                 <button
-                    disabled={isLoading && !documentId}
+                    disabled={isLoading || documentId == null}
                     onClick={() => triggerDocumentScanNewPage()}>Escanear otra pagina</button>
 
                 <button
-                    disabled={isLoading && !documentId}
+                    disabled={isLoading || documentId == null}
                     onClick={() => triggerDocumentStop()}>Terminar documento</button>
             </div>
             <div>
                 <h3>Previewer</h3>
                 <div>
-                    <ReactFilePreviewer file={{
-                        data: scannedImage?.base64Data,
-                        mimeType: "image/jpg",
-                        name: 'image.jpg'
-                    }} />
+                    {scannedImage?.base64Data != null && (
+                        <ReactFilePreviewer
+                            file={{
+                                data: scannedImage.base64Data,
+                                mimeType: "application/pdf",
+                                name: 'test.pdf'
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </div>
   );
 }
 
-interface ScanSingleImage {
-    tempFileId: string;
-    base64Data: string;
-}
-
 interface ScanDocumentResult {
-    tempFileId: string;
+    tempFolderId: string;
     tempPageId: string;
     base64Data: string;
+    fileName: string;
 }
 
 const generateGuid = () => {

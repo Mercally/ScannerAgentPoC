@@ -2,7 +2,7 @@
 
 public class SinglePageResult
 {
-    public Guid TempFileId { get; set; }
+    public Guid? TempFolderId { get; set; }
 
     public Guid TempPageId { get; set; }
 

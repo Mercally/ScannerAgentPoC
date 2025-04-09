@@ -2,26 +2,32 @@
 
 namespace ReactApp.Server.Controllers;
 
-public class UploadFilesController : Controller
+[ApiController]
+[Route("api/[controller]")]
+public class UploadFilesController : ControllerBase
 {
-    public IActionResult Index()
-    {
-        return View();
-    }
-
     [HttpPost]
-    public async Task<IActionResult> UploadFile(IFormFile file)
+    public async Task<IActionResult> UploadFile([FromForm] UploadFileDto requestDto)
     {
-        if (file == null || file.Length == 0)
+        if (requestDto.File == null || requestDto.File.Length == 0)
         {
             return BadRequest("No file uploaded.");
         }
 
-        var filePath = Path.Combine("UploadedFiles", file.FileName);
+        // Use a temporary directory, such as Path.GetTempPath(), or define your own
+        var tempDirectory = Path.Combine(Path.GetTempPath(), "UploadedFiles");
+
+        // Ensure the temp directory exists
+        if (!Directory.Exists(tempDirectory))
+        {
+            Directory.CreateDirectory(tempDirectory);
+        }
+
+        var filePath = Path.Combine(tempDirectory, requestDto.FileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            await file.CopyToAsync(stream);
+            await requestDto.File.CopyToAsync(stream);
         }
 
         return Ok(new { message = "Archivo subido con éxito.", filePath });
