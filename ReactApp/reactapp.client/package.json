@@ -27,6 +27,6 @@
     "vite": "^6.2.0",
     "@types/node": "^22",
     "@microsoft/signalr": "8.0.7",
-    "@react-file-previewer": "0.6.3"
+    "react-file-previewer": "0.6.3"
   }
 }
